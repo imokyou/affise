@@ -6,6 +6,7 @@ import json
 import config
 from offers.appleadstech import Appleadstech
 from offers.ichestnut import Ichestnut
+from offers.hugoffers import Hugoffers
 
 
 class myThread (threading.Thread):
@@ -26,21 +27,51 @@ class Collecter(object):
     def __init__(self, app):
         super(Collecter, self).__init__()
         self.app = app
-        self.api = "%s/3.0/admin/offer?API-Key=%s" % (config.domain, config.key)
+        # self.api = "%s/3.0/admin/offer?API-Key=%s" % (config.domain, config.key)
+        self.api = "%s/3.0/admin/offer" % config.domain
+        self.headers = {
+            "API-Key": config.key,
+            # "Content-Type": "application/json"
+        }
 
     def run(self):
-        for x in xrange(1, 10): 
+        for x in xrange(1, 2): 
             offers = self.app.download(x)
             if not offers:
                 return
-
+            
             for offer in offers:
-                resp = requests.post(self.api, data=json.dumps(offer), timeout=5)
+                print json.dumps(offer)
+                files = {}
+                if offer["logo"] != "":
+                    logo = requests.get(offer["logo"])
+                    if logo and logo.status_code == 200:
+                        try:
+                            files["logo"] = logo.content
+                        except:
+                            pass
+                resp = requests.post(self.api, headers=self.headers, data=offer, files=files, timeout=15, verify=False)
+                try:
+                    print(resp)
+                    content = resp.json()
+                    print content
+                except Exception as e:
+                    print(e)
+
                 if not resp or resp.status_code != 200:
-                    resp = requests.post(api, data=json.dumps(offer), timeout=5)
+                    resp = requests.post(self.api, headers=self.headers, data=offer, files=files, timeout=15, verify=False)
+                
+                try:
+                    print(resp)
+                    content = resp.json()
+                    print content
+                except Exception as e:
+                    print(e)
+            
 
 
 def main():
+    '''
     applead = Appleadstech()
     colletor1 = Collecter(applead)
     thread1 = myThread("applead-collector", colletor1)
@@ -50,6 +81,12 @@ def main():
     colletor2 = Collecter(ichest)
     thread2 = myThread("ichest-collector", colletor2)
     thread2.start()
+    '''
+
+    hoffers = Hugoffers()
+    colletor3 = Collecter(hoffers)
+    thread3 = myThread("hugoffers-collector", colletor3)
+    thread3.start()
 
 
 if __name__ == '__main__':

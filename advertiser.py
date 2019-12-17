@@ -1,4 +1,5 @@
 # coding=utf8
+import json
 import logging
 import requests
 import config
@@ -48,27 +49,27 @@ class Advertiser(object):
 
 if __name__ == '__main__':
     app = Advertiser()
-    # rows = app.get_list()
-    # print(rows)
+    rows = app.get_list()
+    print(json.dumps(rows))
 
-    advertiser1 = {
-        "title": "Appleadstech",
-        "contact": "",
-        "skype": "",
-        "manager": "",
-        "url": "",
-        "email": "",
-        # "allowed_ip": "",
-        "address_1": "",
-        "address_2": "",
-        "city": "",
-        "country": "",
-        "zip_code": "",
-        # "vat_code": "",
-        # "sub_account_1": "",
-        # "sub_account_2": "",
-        # "sub_account_1_except": "",
-        # "sub_account_2_except": ""
-    }
-    resp = app.add(advertiser1)
-    print(resp)
+    # advertiser1 = {
+    #     "title": "Appleadstech",
+    #     "contact": "",
+    #     "skype": "",
+    #     "manager": "",
+    #     "url": "",
+    #     "email": "",
+    #     # "allowed_ip": "",
+    #     "address_1": "",
+    #     "address_2": "",
+    #     "city": "",
+    #     "country": "",
+    #     "zip_code": "",
+    #     # "vat_code": "",
+    #     # "sub_account_1": "",
+    #     # "sub_account_2": "",
+    #     # "sub_account_1_except": "",
+    #     # "sub_account_2_except": ""
+    # }
+    # resp = app.add(advertiser1)
+    # print(resp)
