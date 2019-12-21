@@ -3,6 +3,7 @@ import logging
 import threading
 import requests
 import json
+import urllib
 import config
 from offers.appleadstech import Appleadstech
 from offers.ichestnut import Ichestnut
@@ -31,9 +32,43 @@ class Collecter(object):
         self.api = "%s/3.0/admin/offer" % config.domain
         self.headers = {
             "API-Key": config.key,
-            # "Content-Type": "application/json"
+            'content-type': 'application/x-www-form-urlencoded'
         }
 
+    def build_query(self, offer):
+        querys = []
+        querys.append("title=%s" % offer["title"])
+        querys.append("advertiser=%s" % offer["advertiser"])
+        querys.append("url=%s" % urllib.quote(offer["url"]))
+        querys.append("url_preview=%s" % offer["url_preview"])
+        querys.append("stopDate=%s" % offer["stopDate"])
+        querys.append("start_at=%s" % offer["start_at"])
+        querys.append("status=%s" % offer["status"])
+        querys.append("is_cpi=%s" % offer["is_cpi"])
+
+
+        for x in xrange(len(offer["payments"])):
+            querys.append("payments[%s][goal]=%s" % (x, 1))
+            querys.append("payments[%s][total]=%s" % (x, offer["payments"][x]['total']))
+            querys.append("payments[%s][currency]=%s" % (x, offer["payments"][x]['currency']))
+            querys.append("payments[%s][revenue]=%s" % (x, offer["payments"][x]['revenue']))
+            querys.append("payments[%s][type]=%s" % (x, offer["payments"][x]['type']))
+
+        for x in xrange(len(offer["caps"])):
+            querys.append("caps[%s][affiliate_type]=%s" % (x, offer["caps"][x]['affiliate_type']))
+            querys.append("caps[%s][goal_type]=%s" % (x, offer["caps"][x]['goal_type']))
+            querys.append("caps[%s][period]=%s" % (x, offer["caps"][x]['period']))
+            querys.append("caps[%s][type]=%s" % (x, offer["caps"][x]['type']))
+            querys.append("caps[%s][value]=%s" % (x, offer["caps"][x]['value']))
+
+        for x in xrange(len(offer["targeting"])):
+            for k in xrange(len(offer["targeting"][x]["country"]["allow"])):
+                country_allow = offer["targeting"][x]["country"]["allow"][k]
+                querys.append("targeting[%s][country][allow][%s]=%s" % (x, k, country_allow))
+
+        return "&".join(querys)
+
+    
     def run(self):
         for x in xrange(1, 2): 
             offers = self.app.download(x)
@@ -41,32 +76,38 @@ class Collecter(object):
                 return
             
             for offer in offers:
-                print json.dumps(offer)
+                # print json.dumps(offer)
                 files = {}
                 if offer["logo"] != "":
-                    logo = requests.get(offer["logo"])
-                    if logo and logo.status_code == 200:
-                        try:
-                            files["logo"] = logo.content
-                        except:
-                            pass
-                resp = requests.post(self.api, headers=self.headers, data=offer, files=files, timeout=15, verify=False)
+                    try:
+                        logo = requests.get(offer["logo"], verify=False)
+                        files["logo"] = logo.content
+                    except:
+                        pass
+
+                post_data = self.build_query(offer)
+                print(post_data)
+                # resp = requests.post(self.api, headers=self.headers, data=post_data, files=files, timeout=15, verify=False)
+                resp = requests.request("POST", self.api, headers=self.headers, data=post_data, timeout=15, verify=False)
                 try:
                     print(resp)
                     content = resp.json()
                     print content
+                    print resp.text
                 except Exception as e:
                     print(e)
 
+'''
                 if not resp or resp.status_code != 200:
                     resp = requests.post(self.api, headers=self.headers, data=offer, files=files, timeout=15, verify=False)
                 
-                try:
-                    print(resp)
-                    content = resp.json()
-                    print content
-                except Exception as e:
-                    print(e)
+                    try:
+                        print(resp)
+                        content = resp.json()
+                        print content
+                    except Exception as e:
+                        print(e)
+'''
             
 
 

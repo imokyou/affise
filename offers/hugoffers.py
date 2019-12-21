@@ -53,46 +53,45 @@ class Hugoffers(object):
         caps = []
         if d["daily_cap"] != 0:   
             caps.append({
+                "affiliate_type": "all",
+                "goal_type": "all",
                 "period": "day",
                 "type": "conversions",
-                "value": d["daily_cap"],
-                "goals": [],
-                "goal_type": [],
-                "affiliates":[],
-                "affiliate_type": []
+                "value": d["daily_cap"]
             })
         return caps
+
 
     def extrace_offer_payments(self, d):
         payments = []
         payments.append({
-            # "partners": [],
-            # "countries": [],
-            # "country_exclude": [],
-            # "cities": [],
-            # "devices": [],
-            # "os": [],
-            "revenue": d["price"],
-            # "currency": "",
+            "goal": 1,
+            "total": d["price"],
+            "currency": "USD",
+            "type": "fixed",
+            "revenue": d["price"]
         })
         return payments
 
     def extrace_offer_targeting(self, d):
-        targets = {}
-        countries = []
+        targets = {
+            "country": {"allow":[], "deny":[]},
+            # "region": {"allow":[], "deny":[]},
+            # "city": {"allow":[], "deny":[]},
+            # "os": {"allow":[], "deny":[]},
+            # "isp": {"allow":[], "deny":[]},
+            # "ip": {"allow":[], "deny":[]},
+            # "browser": {"allow":[], "deny":[]},
+            # "brand": {"allow":[], "deny":[]},
+            # "device_type": [],
+            # "connection": [],
+            # "affiliate_id": [],
+            # "sub": [],
+            # "deny_groups":[],
+            # "url": ""
+        }
         if d["geo"] != "":
-            countries = d["geo"].split(",")
-            targets["country"] = {
-                "allow": countries
-            }
-        if d["platform"] != "":
-            targets["os"] = {
-                "allow": [{
-                    "name": d['platform'],
-                    "comparison": "",
-                    "version": ""
-                }]
-            }
+            targets["country"]["allow"] = d["geo"].split(",")
         return [targets]
 
     def extract_offer(self, data):
@@ -114,30 +113,16 @@ class Hugoffers(object):
                 "title": d["offer_name"],
                 "advertiser": "5df8c50410768e44b351cc66",
                 "url": d["tracking_link"],
-                "cross_postback_url": "",
                 "url_preview": d["preview_link"],
-                "trafficback_url": "",
-                "domain_url": 0,
-                "description_lang": [],
                 "stopDate": datetime.strptime(d["end_date"], "%Y-%m-%dT%H:%M:%S+0000").strftime("%Y-%m-%d %H:%M:%S"),
                 "start_at": start_at.strftime("%Y-%m-%d %H:%M:%S"),
-                "creativeFiles": [],
-                "creativeUrls": self.extrace_offer_creatvies(d),
-                "sources": [],
+                # "creativeUrls": self.extrace_offer_creatvies(d),
                 "logo": self.extrace_offer_logo(d),
                 "status": status,
-                "tags": [],
-                "privacy": "public",
-                "is_top": 0,
                 "is_cpi": is_cpi,
                 "payments": self.extrace_offer_payments(d),
-                "partner_payments": [],
-                "notice_percent_overcap": 90,
-                "landings": [],
-                "strictly_country": 0,
-                "restriction_os": [],
                 "caps": self.extrace_offer_caps(d),
-                # "targeting": self.extrace_offer_targeting(d)
+                "targeting": self.extrace_offer_targeting(d)
             })
         return offers
 

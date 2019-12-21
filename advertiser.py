@@ -8,7 +8,8 @@ import config
 
 class Advertiser(object):
     routers = {
-        "list": "/3.0/admin/advertisers",
+        # "list": "/3.0/admin/advertisers",
+        "list": "/3.0/offers",
         "get": "/3.0/admin/advertiser/%s",
         "add": "/3.0/admin/advertiser"
     }
@@ -28,7 +29,7 @@ class Advertiser(object):
         return api    
 
 
-    def get_list(self, page=1, limit=50):
+    def get_list(self, page=1, limit=1):
         query = "page=%s&limit=%s" % (page, limit)
         api = self.get_list_api() + "&" + query
         self.logger.info("download advertisers from %s" % api)
