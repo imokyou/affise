@@ -66,9 +66,9 @@ class Hugoffers(object):
         payments = []
         payments.append({
             "goal": 1,
-            "total": d["price"],
+            "total": 100,
             "currency": "USD",
-            "type": "fixed",
+            "type": "percent",
             "revenue": d["price"]
         })
         return payments

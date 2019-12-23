@@ -70,7 +70,7 @@ class Collecter(object):
 
     
     def run(self):
-        for x in xrange(1, 2): 
+        for x in xrange(2, 3): 
             offers = self.app.download(x)
             if not offers:
                 return
@@ -87,7 +87,6 @@ class Collecter(object):
 
                 post_data = self.build_query(offer)
                 print(post_data)
-                # resp = requests.post(self.api, headers=self.headers, data=post_data, files=files, timeout=15, verify=False)
                 resp = requests.request("POST", self.api, headers=self.headers, data=post_data, timeout=15, verify=False)
                 try:
                     print(resp)
@@ -97,17 +96,6 @@ class Collecter(object):
                 except Exception as e:
                     print(e)
 
-'''
-                if not resp or resp.status_code != 200:
-                    resp = requests.post(self.api, headers=self.headers, data=offer, files=files, timeout=15, verify=False)
-                
-                    try:
-                        print(resp)
-                        content = resp.json()
-                        print content
-                    except Exception as e:
-                        print(e)
-'''
             
 
 
