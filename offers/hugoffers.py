@@ -1,4 +1,7 @@
-# codnig=utf8
+# coding=utf8
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 import requests
 import logging
 import json
@@ -8,10 +11,13 @@ from datetime import datetime
 class Hugoffers(object):
     domain = "http://tapcrane.hoapi0.com"
     key = "1d72fd30c41a487d9b798408148cc5fa"
+    advertiser = "5df8c50410768e44b351cc66"
     api = ""
     timeout = 15
     limit = 1
     logger = None
+    price_lower = 0.2
+    payment_percent = 0.5
     
     statusMap = {
         "RUNNING": "active"
@@ -37,6 +43,12 @@ class Hugoffers(object):
             resp = requests.get(self.api, timeout=self.timeout)
         return resp
 
+    def match_price_lower(self, price):
+        if float(price) < self.price_lower:
+            return False
+
+        return True
+
     def extrace_offer_creatvies(self, d):
         creatives = []
         for c in d['creative_link']:
@@ -61,15 +73,18 @@ class Hugoffers(object):
             })
         return caps
 
+    def cal_channel_payment(self, price):
+        return price * self.payment_percent
+
 
     def extrace_offer_payments(self, d):
         payments = []
         payments.append({
-            "goal": 1,
-            "total": 100,
+            "goal": "1",
+            "total": d["price"],
             "currency": "USD",
-            "type": "percent",
-            "revenue": d["price"]
+            "type": "fixed",
+            "revenue": self.cal_channel_payment(d["price"])
         })
         return payments
 
@@ -93,6 +108,7 @@ class Hugoffers(object):
         if d["geo"] != "":
             targets["country"]["allow"] = d["geo"].split(",")
         return [targets]
+        
 
     def extract_offer(self, data):
         offers = []
@@ -108,10 +124,14 @@ class Hugoffers(object):
             start_at = datetime.strptime(d["start_date"], "%Y-%m-%dT%H:%M:%S+0000")
             if start_at < datetime.now():
                 start_at = datetime.now()
+
+            if not self.match_price_lower(d['price']):
+                continue
     
             offers.append({
+                "external_offer_id": d["campid"],
                 "title": d["offer_name"],
-                "advertiser": "5df8c50410768e44b351cc66",
+                "advertiser": self.advertiser,
                 "url": d["tracking_link"],
                 "url_preview": d["preview_link"],
                 "stopDate": datetime.strptime(d["end_date"], "%Y-%m-%dT%H:%M:%S+0000").strftime("%Y-%m-%d %H:%M:%S"),
