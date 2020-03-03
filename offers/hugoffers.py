@@ -14,7 +14,7 @@ class Hugoffers(object):
     advertiser = "5df8c50410768e44b351cc66"
     api = ""
     timeout = 15
-    limit = 1
+    limit = 20
     logger = None
     price_lower = 0.2
     payment_percent = 0.5

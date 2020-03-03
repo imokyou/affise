@@ -41,8 +41,8 @@ class Collecter(object):
             "API-Key": config.key,
             'content-type': 'application/x-www-form-urlencoded'
         }
-        self.request_timeout = 15
-        self.sleep_time = 60 * 10
+        self.request_timeout = 30
+        self.sleep_time = 60 * 10 * 6
         self.offerDao = OfferDao(app.advertiser)
 
     def build_query(self, offer):
@@ -146,7 +146,7 @@ class Collecter(object):
             print(e)
             return None
 
-    def list(self, advertiser = "", page = 1, limit = 0):
+    def list(self, advertiser = "", page = 1, limit = 20):
         if limit == 0:
             limit = self.list_limit
         api = "%s?page=%s&limit=%s" % (self.list_api, page, limit)
@@ -163,15 +163,12 @@ class Collecter(object):
 
     def list_all(self, advertiser = ""):
         result = {"offers": []}
-        for x in xrange(1, 5):
+        for x in xrange(1, 10):
             resp = self.list(advertiser, x)
             if not resp or not resp["offers"]:
                 break
 
-            if not result["offers"]:
-                result = resp
-            else:
-                result["offers"] = result["offers"].extend(resp["offers"])
+            result["offers"].extend(resp["offers"])
 
             if resp["pagination"]["total_count"] <= self.list_limit:
                 break
@@ -204,8 +201,7 @@ class Collecter(object):
         '''
         while True:
             self.store_offer_external_id(self.app.advertiser)
-
-            for x in xrange(5, 6): 
+            for x in xrange(1, 10): 
                 offers = self.app.download(x)
                 if not offers:
                     return
@@ -217,6 +213,7 @@ class Collecter(object):
                         resp = self.add(offer)
                     else:
                         self.update_offer_status(ids[0], offer["status"])
+                    time.sleep(3)
             print "sleep", self.sleep_time, "seconds..."
             time.sleep(self.sleep_time)
                     
