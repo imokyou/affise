@@ -242,7 +242,7 @@ class Collecter(object):
             time.sleep(self.sleep_time)
         '''
         while True:
-            # self.store_offer_external_id(self.app.advertiser)
+            self.store_offer_external_id(self.app.advertiser)
             all_offers = self.get_offer_external_ids(self.app.advertiser)
             all_external_offers = self.get_all_external_offers()
             
@@ -259,7 +259,7 @@ class Collecter(object):
             for ext_id, v in all_external_offers.items():
                 ids = self.offerDao.find_by_external_id(v["external_offer_id"])
                 if not ids:
-                    resp = self.add(offer)
+                    resp = self.add(v)
                 else:
                     print "offer exists", ext_id, v["external_offer_id"]
             
