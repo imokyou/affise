@@ -101,14 +101,9 @@ class Collecter(object):
                     pass
 
             post_data = self.build_query(offer)
-            print(post_data)
+            # print(post_data)
             resp = self.make_post(self.api, post_data)
-            try:
-                content = resp.json()
-                return content
-            except Exception as e:
-                print(e)
-                return None
+            return resp.json()
         except:
             pass
         
