@@ -257,8 +257,8 @@ class Collecter(object):
             for ext_id, v in all_external_offers.items():
                 ids = self.offerDao.find_by_external_id(v["external_offer_id"])
                 if not ids:
-                    # resp = self.add(v)
-                    pass
+                    resp = self.add(v)
+                    # pass
                 else:
                     print "offer exists", ext_id, v["external_offer_id"]
             
