@@ -90,24 +90,28 @@ class Collecter(object):
         return resp
 
     def add(self, offer):
-        print "create new offer", offer["title"].encode("utf8")
-        files = {}
-        if offer["logo"] != "":
-            try:
-                logo = requests.get(offer["logo"], verify=False)
-                files["logo"] = logo.content
-            except:
-                pass
-
-        post_data = self.build_query(offer)
-        print(post_data)
-        resp = self.make_post(self.api, post_data)
         try:
-            content = resp.json()
-            return content
-        except Exception as e:
-            print(e)
-            return None
+            print "create new offer", offer["title"].encode("utf8")
+            files = {}
+            if offer["logo"] != "":
+                try:
+                    logo = requests.get(offer["logo"], verify=False)
+                    files["logo"] = logo.content
+                except:
+                    pass
+
+            post_data = self.build_query(offer)
+            print(post_data)
+            resp = self.make_post(self.api, post_data)
+            try:
+                content = resp.json()
+                return content
+            except Exception as e:
+                print(e)
+                return None
+        except:
+            pass
+        
 
     def update_offer_external_id(self, id, offer_external_id):
         api = "%s/%s" % (self.api, id)
