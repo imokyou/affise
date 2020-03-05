@@ -3,6 +3,7 @@ import logging
 import threading
 import requests
 import json
+import signal
 import os
 import csv
 import urllib
@@ -278,10 +279,20 @@ def main():
     thread2.start()
     '''
 
-    hoffers = Hugoffers()
-    colletor3 = Collecter(hoffers)
-    thread3 = myThread("hugoffers-collector", colletor3)
-    thread3.start()
+    try:
+        signal.signal(signal.SIGINT, quit)
+        signal.signal(signal.SIGTERM, quit)
+
+        hoffers = Hugoffers()
+        colletor3 = Collecter(hoffers)
+        thread3 = myThread("hugoffers-collector", colletor3)
+        thread3.setDaemon(True)
+        thread3.start()
+
+        while True:
+            pass
+    except KeyboardInterrupt, e:
+        print "you stop the threading"
 
 
 if __name__ == '__main__':
