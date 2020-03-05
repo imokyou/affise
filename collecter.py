@@ -92,7 +92,7 @@ class Collecter(object):
 
     def add(self, offer):
         try:
-            print "create new offer", offer["title"].encode("utf8")
+            print "create new offer", offer["title"].encode("utf8"), offer['external_offer_id']
             files = {}
             if offer["logo"] != "":
                 try:
