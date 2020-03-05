@@ -153,7 +153,7 @@ class Collecter(object):
     def list(self, advertiser = "", page = 1, limit = 100):
         if limit == 0:
             limit = self.list_limit
-        api = "%s?page=%s&limit=%s" % (self.list_api, page, limit)
+        api = "%s?status[]=stopped&status[]=active&page=%s&limit=%s" % (self.list_api, page, limit)
         if advertiser != "":
             api = "%s&advertiser[]=%s" % (api, advertiser)
         
@@ -172,11 +172,9 @@ class Collecter(object):
             if not resp or not resp["offers"]:
                 break
 
-            result["offers"].extend(resp["offers"])
+            print(len(resp["offers"]))
 
-            if resp["pagination"]["total_count"] <= self.list_limit:
-                break
-            time.sleep(1)
+            result["offers"].extend(resp["offers"])
         return result
 
     def store_offer_external_id(self, advertiser):
@@ -258,7 +256,8 @@ class Collecter(object):
             for ext_id, v in all_external_offers.items():
                 ids = self.offerDao.find_by_external_id(v["external_offer_id"])
                 if not ids:
-                    resp = self.add(v)
+                    # resp = self.add(v)
+                    pass
                 else:
                     print "offer exists", ext_id, v["external_offer_id"]
             
