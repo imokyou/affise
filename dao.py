@@ -17,12 +17,12 @@ class OfferDao(object):
       with open(self.filename, "w") as f:
         pass
 
-    def ids_store_append(self, id, offer_id, external_offer_id): 
+    def ids_store_append(self, id, offer_id, external_offer_id, status): 
       if not external_offer_id:
         external_offer_id = "0"
       with open(self.filename, "a+") as f:
         writer = csv.writer(f)
-        writer.writerow([id, offer_id, external_offer_id])
+        writer.writerow([id, offer_id, external_offer_id, status])
 
     def ids_store_get(self):
       data = []
@@ -61,3 +61,13 @@ class OfferDao(object):
         if d[2].strip() == external_id:
           return d
       return None
+
+    def get_all(self):
+      offers = {}
+      with open(self.filename, "r+") as f:
+        reader = csv.reader(f)
+        for item in reader:
+          if len(item) < 3 or item[2] == "":
+            continue
+          offers[item[2]] = item
+      return offers

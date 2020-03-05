@@ -130,7 +130,7 @@ class Collecter(object):
             post_data += "&url=%s" % urllib.quote(url)
         resp = self.make_post(api, post_data)
         print resp
-        print resp.json()
+        # print resp.json()
         try:
             content = resp.json()
             return content
@@ -188,7 +188,21 @@ class Collecter(object):
         self.offerDao.ids_store_clear()
         for r in resp["offers"]:
             # print(r["id"], r["offer_id"], r["external_offer_id"])
-            self.offerDao.ids_store_append(r["id"], r["offer_id"], r["external_offer_id"])
+            self.offerDao.ids_store_append(r["id"], r["offer_id"], r["external_offer_id"], r["status"])
+
+    def get_offer_external_ids(self, advertiser):
+        return self.offerDao.get_all()
+
+    def get_all_external_offers(self):
+        external_offers = {}
+        for x in xrange(1, 20): 
+            offers = self.app.download(x)
+            if not offers:
+                return external_offers
+            
+            for offer in offers:
+                external_offers[offer['external_offer_id']] = offer
+        return external_offers
 
 
     def run(self):
@@ -206,6 +220,7 @@ class Collecter(object):
         '''
         resp = self.list_all("5df8c50410768e44b351cc66")
         print resp
+        '''
         '''
         while True:
             self.store_offer_external_id(self.app.advertiser)
@@ -225,6 +240,31 @@ class Collecter(object):
                     time.sleep(3)
             print "sleep", self.sleep_time, "seconds..."
             time.sleep(self.sleep_time)
+        '''
+        while True:
+            # self.store_offer_external_id(self.app.advertiser)
+            all_offers = self.get_offer_external_ids(self.app.advertiser)
+            all_external_offers = self.get_all_external_offers()
+            
+            not_exists_offers = {}
+            exists_offers = {}
+            for ext_id, v in all_offers.items():
+                if not all_external_offers.has_key(ext_id):
+                    not_exists_offers[ext_id] = v
+                    if v[3] == "active":
+                        self.update_offer_status(v[0], "stopped")
+                else:
+                    exists_offers[ext_id] = v
+
+            for ext_id, v in all_external_offers.items():
+                ids = self.offerDao.find_by_external_id(v["external_offer_id"])
+                if not ids:
+                    resp = self.add(offer)
+                else:
+                    print "offer exists", ext_id, v["external_offer_id"]
+            
+            print len(not_exists_offers), len(exists_offers), len(all_offers), len(all_external_offers)
+            break
                     
 
 def main():
