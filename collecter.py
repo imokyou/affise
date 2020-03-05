@@ -258,12 +258,13 @@ class Collecter(object):
                 ids = self.offerDao.find_by_external_id(v["external_offer_id"])
                 if not ids:
                     resp = self.add(v)
+                    print resp
                     # pass
                 else:
                     print "offer exists", ext_id, v["external_offer_id"]
             
             print len(not_exists_offers), len(exists_offers), len(all_offers), len(all_external_offers)
-            time.sleep(60 * 10)
+            time.sleep(60 * 30)
                     
 
 def main():
