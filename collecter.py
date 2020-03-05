@@ -48,7 +48,7 @@ class Collecter(object):
 
     def build_query(self, offer):
         querys = []
-        querys.append("title=%s" % offer["title"])
+        querys.append("title=%s" % urllib.quote(offer["title"]))
         querys.append("advertiser=%s" % offer["advertiser"])
         querys.append("url=%s" % urllib.quote(offer["url"]))
         querys.append("url_preview=%s" % offer["url_preview"])
