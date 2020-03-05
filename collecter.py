@@ -51,7 +51,7 @@ class Collecter(object):
         querys.append("title=%s" % urllib.quote(offer["title"]))
         querys.append("advertiser=%s" % offer["advertiser"])
         querys.append("url=%s" % urllib.quote(offer["url"]))
-        querys.append("url_preview=%s" % offer["url_preview"])
+        querys.append("url_preview=%s" % urllib.quote(offer["url_preview"]))
         querys.append("stopDate=%s" % offer["stopDate"])
         querys.append("start_at=%s" % offer["start_at"])
         querys.append("status=%s" % offer["status"])
