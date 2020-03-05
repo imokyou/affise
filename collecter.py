@@ -102,7 +102,7 @@ class Collecter(object):
                     pass
 
             post_data = self.build_query(offer)
-            # print(post_data)
+            print(post_data)
             resp = self.make_post(self.api, post_data)
             return resp.json()
         except:
@@ -258,7 +258,6 @@ class Collecter(object):
                 ids = self.offerDao.find_by_external_id(v["external_offer_id"])
                 if not ids:
                     resp = self.add(v)
-                    print v
                     print resp
                     # pass
                 else:
