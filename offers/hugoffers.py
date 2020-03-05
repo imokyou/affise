@@ -13,8 +13,8 @@ class Hugoffers(object):
     key = "1d72fd30c41a487d9b798408148cc5fa"
     advertiser = "5df8c50410768e44b351cc66"
     api = ""
-    timeout = 15
-    limit = 20
+    timeout = 120
+    limit = 50
     logger = None
     price_lower = 0.2
     payment_percent = 0.5
@@ -108,6 +108,13 @@ class Hugoffers(object):
         if d["geo"] != "":
             targets["country"]["allow"] = d["geo"].split(",")
         return [targets]
+
+    def extract_tracking_link(self, tracking_link):
+        return tracking_link.replace('[click_id]', '[clickid]') \
+            .replace('[source]', '[sub2]') \
+            .replace('[idfa]', '[sub3]') \
+            .replace('[advertising_id]', '[sub4]') \
+            .replace('[', '{').replace(']', '}')
         
 
     def extract_offer(self, data):
@@ -132,7 +139,7 @@ class Hugoffers(object):
                 "external_offer_id": d["campid"],
                 "title": d["offer_name"],
                 "advertiser": self.advertiser,
-                "url": d["tracking_link"],
+                "url": self.extract_tracking_link(d["tracking_link"]),
                 "url_preview": d["preview_link"],
                 "stopDate": datetime.strptime(d["end_date"], "%Y-%m-%dT%H:%M:%S+0000").strftime("%Y-%m-%d %H:%M:%S"),
                 "start_at": start_at.strftime("%Y-%m-%d %H:%M:%S"),
@@ -162,7 +169,7 @@ class Hugoffers(object):
 
 if __name__ == '__main__':
     app = Hugoffers()
-    for x in xrange(1, 10):
+    for x in xrange(1, 2):
         offers = app.download(x)
         if not offers:
             app.logger.info("pull offers finish in page %s" % x)

@@ -41,7 +41,7 @@ class Collecter(object):
             "API-Key": config.key,
             'content-type': 'application/x-www-form-urlencoded'
         }
-        self.request_timeout = 30
+        self.request_timeout = 120
         self.sleep_time = 60 * 10 * 6
         self.offerDao = OfferDao(app.advertiser)
 
@@ -120,12 +120,17 @@ class Collecter(object):
             print(e)
             return None
 
-    def update_offer_status(self, id, status):
-        print "update offer status", id, status
+    def update_offer_status(self, id, status, url=""):
+        print "update offer status", id, status, url
 
         api = "%s/%s" % (self.api, id)
+        
         post_data = "status=%s" % status
+        if url != "":
+            post_data += "&url=%s" % urllib.quote(url)
         resp = self.make_post(api, post_data)
+        print resp
+        print resp.json()
         try:
             content = resp.json()
             return content
@@ -146,7 +151,7 @@ class Collecter(object):
             print(e)
             return None
 
-    def list(self, advertiser = "", page = 1, limit = 20):
+    def list(self, advertiser = "", page = 1, limit = 100):
         if limit == 0:
             limit = self.list_limit
         api = "%s?page=%s&limit=%s" % (self.list_api, page, limit)
@@ -163,7 +168,7 @@ class Collecter(object):
 
     def list_all(self, advertiser = ""):
         result = {"offers": []}
-        for x in xrange(1, 10):
+        for x in xrange(1, 50):
             resp = self.list(advertiser, x)
             if not resp or not resp["offers"]:
                 break
@@ -172,6 +177,7 @@ class Collecter(object):
 
             if resp["pagination"]["total_count"] <= self.list_limit:
                 break
+            time.sleep(1)
         return result
 
     def store_offer_external_id(self, advertiser):
@@ -194,14 +200,16 @@ class Collecter(object):
         '''
         resp = self.find("117533")
         print(resp)
+        return
         '''
+
         '''
         resp = self.list_all("5df8c50410768e44b351cc66")
         print resp
         '''
         while True:
             self.store_offer_external_id(self.app.advertiser)
-            for x in xrange(1, 10): 
+            for x in xrange(1, 20): 
                 offers = self.app.download(x)
                 if not offers:
                     return
@@ -210,14 +218,14 @@ class Collecter(object):
                     print offer["external_offer_id"]
                     ids = self.offerDao.find_by_external_id(offer["external_offer_id"])
                     if not ids:
-                        resp = self.add(offer)
+                        # resp = self.add(offer)
+                        pass
                     else:
-                        self.update_offer_status(ids[0], offer["status"])
+                        self.update_offer_status(ids[0], offer["status"], offer["url"])
                     time.sleep(3)
             print "sleep", self.sleep_time, "seconds..."
             time.sleep(self.sleep_time)
                     
-
 
 def main():
     '''
