@@ -90,7 +90,7 @@ class Collecter(object):
         return resp
 
     def add(self, offer):
-        print "create new offer", offer["title"]
+        print "create new offer", offer["title"].encode("utf8")
         files = {}
         if offer["logo"] != "":
             try:
@@ -264,7 +264,7 @@ class Collecter(object):
                     print "offer exists", ext_id, v["external_offer_id"]
             
             print len(not_exists_offers), len(exists_offers), len(all_offers), len(all_external_offers)
-            break
+            time.sleep(60 * 10)
                     
 
 def main():
