@@ -8,8 +8,8 @@ import config
 
 class Advertiser(object):
     routers = {
-        # "list": "/3.0/admin/advertisers",
-        "list": "/3.0/offers",
+        "list": "/3.0/admin/advertisers",
+        # "list": "/3.0/offers",
         "get": "/3.0/admin/advertiser/%s",
         "add": "/3.0/admin/advertiser"
     }
@@ -29,7 +29,7 @@ class Advertiser(object):
         return api    
 
 
-    def get_list(self, page=1, limit=1):
+    def get_list(self, page=1, limit=100):
         query = "page=%s&limit=%s" % (page, limit)
         api = self.get_list_api() + "&" + query
         self.logger.info("download advertisers from %s" % api)
@@ -41,7 +41,8 @@ class Advertiser(object):
 
     def add(self, advertiser):
         api = self.get_add_api()
-        resp  = requests.post(api, data=json.dumps(advertiser), timeout=3)
+        resp  = requests.post(api, data=advertiser, timeout=120)
+        print resp, resp.json()
         if not resp or resp.status_code != 200:
             return None
         return resp.json()
@@ -51,26 +52,28 @@ class Advertiser(object):
 if __name__ == '__main__':
     app = Advertiser()
     rows = app.get_list()
-    print(json.dumps(rows))
+    for r in rows["advertisers"]:
+        print r["title"], r["id"]
+    # print(json.dumps(rows))
 
-    # advertiser1 = {
-    #     "title": "Appleadstech",
-    #     "contact": "",
-    #     "skype": "",
-    #     "manager": "",
-    #     "url": "",
-    #     "email": "",
-    #     # "allowed_ip": "",
-    #     "address_1": "",
-    #     "address_2": "",
-    #     "city": "",
-    #     "country": "",
-    #     "zip_code": "",
-    #     # "vat_code": "",
-    #     # "sub_account_1": "",
-    #     # "sub_account_2": "",
-    #     # "sub_account_1_except": "",
-    #     # "sub_account_2_except": ""
-    # }
+    advertiser1 = {
+        "title": "Duunion",
+        "contact": "",
+        "skype": "",
+        "manager": "",
+        "url": "",
+        "email": "",
+        # "allowed_ip": "",
+        "address_1": "",
+        "address_2": "",
+        "city": "",
+        "country": "",
+        "zip_code": "",
+        # "vat_code": "",
+        # "sub_account_1": "",
+        # "sub_account_2": "",
+        # "sub_account_1_except": "",
+        # "sub_account_2_except": ""
+    }
     # resp = app.add(advertiser1)
     # print(resp)

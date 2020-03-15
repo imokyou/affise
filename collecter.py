@@ -1,4 +1,5 @@
 # coding=utf8
+import traceback
 import logging
 import threading
 import requests
@@ -12,6 +13,7 @@ import time
 from offers.appleadstech import Appleadstech
 from offers.ichestnut import Ichestnut
 from offers.hugoffers import Hugoffers
+from offers.duunion import DuunionOffers
 from dao import OfferDao
 
 
@@ -102,10 +104,10 @@ class Collecter(object):
                     pass
 
             post_data = self.build_query(offer)
-            # print(post_data)
             resp = self.make_post(self.api, post_data)
             return resp.json()
         except:
+            traceback.print_exc()
             pass
         
 
@@ -193,7 +195,7 @@ class Collecter(object):
 
     def get_all_external_offers(self):
         external_offers = {}
-        for x in xrange(1, 20): 
+        for x in xrange(1, 2): 
             offers = self.app.download(x)
             if not offers:
                 return external_offers
@@ -204,41 +206,6 @@ class Collecter(object):
 
 
     def run(self):
-        '''
-        resp = self.update_offer_external_id("117534", "373032")
-        print(resp)
-        '''
-        
-        '''
-        resp = self.find("117533")
-        print(resp)
-        return
-        '''
-
-        '''
-        resp = self.list_all("5df8c50410768e44b351cc66")
-        print resp
-        '''
-        '''
-        while True:
-            self.store_offer_external_id(self.app.advertiser)
-            for x in xrange(1, 20): 
-                offers = self.app.download(x)
-                if not offers:
-                    return
-                
-                for offer in offers:
-                    print offer["external_offer_id"]
-                    ids = self.offerDao.find_by_external_id(offer["external_offer_id"])
-                    if not ids:
-                        # resp = self.add(offer)
-                        pass
-                    else:
-                        self.update_offer_status(ids[0], offer["status"], offer["url"])
-                    time.sleep(3)
-            print "sleep", self.sleep_time, "seconds..."
-            time.sleep(self.sleep_time)
-        '''
         while True:
             self.store_offer_external_id(self.app.advertiser)
             all_offers = self.get_offer_external_ids(self.app.advertiser)
@@ -258,12 +225,13 @@ class Collecter(object):
                 ids = self.offerDao.find_by_external_id(v["external_offer_id"])
                 if not ids:
                     resp = self.add(v)
-                    # print resp
+                    print resp
                     # pass
                 else:
                     print "offer exists", ext_id, v["external_offer_id"]
             
             print len(not_exists_offers), len(exists_offers), len(all_offers), len(all_external_offers)
+            break
             time.sleep(60 * 30)
                     
 
@@ -284,8 +252,8 @@ def main():
         signal.signal(signal.SIGINT, quit)
         signal.signal(signal.SIGTERM, quit)
 
-        hoffers = Hugoffers()
-        colletor3 = Collecter(hoffers)
+        offerApp = DuunionOffers()
+        colletor3 = Collecter(offerApp)
         thread3 = myThread("hugoffers-collector", colletor3)
         thread3.setDaemon(True)
         thread3.start()
