@@ -94,7 +94,7 @@ class Collecter(object):
 
     def add(self, offer):
         try:
-            print "create new offer", offer["title"].encode("utf8"), offer['external_offer_id']
+            print self.app.name, "create new offer", offer["title"].encode("utf8"), offer['external_offer_id']
             files = {}
             if offer["logo"] != "":
                 try:
@@ -195,7 +195,7 @@ class Collecter(object):
 
     def get_all_external_offers(self):
         external_offers = {}
-        for x in xrange(1, 2): 
+        for x in xrange(1, 10): 
             offers = self.app.download(x)
             if not offers:
                 return external_offers
@@ -231,7 +231,6 @@ class Collecter(object):
                     print "offer exists", ext_id, v["external_offer_id"]
             
             print len(not_exists_offers), len(exists_offers), len(all_offers), len(all_external_offers)
-            break
             time.sleep(60 * 30)
                     
 
@@ -252,11 +251,17 @@ def main():
         signal.signal(signal.SIGINT, quit)
         signal.signal(signal.SIGTERM, quit)
 
-        offerApp = DuunionOffers()
-        colletor3 = Collecter(offerApp)
-        thread3 = myThread("hugoffers-collector", colletor3)
-        thread3.setDaemon(True)
-        thread3.start()
+        offerApp1 = Hugoffers()
+        colletor1 = Collecter(offerApp1)
+        thread1 = myThread("Hugoffers-collector", colletor1)
+        thread1.setDaemon(True)
+        thread1.start()
+
+        offerApp2 = DuunionOffers()
+        colletor2 = Collecter(offerApp2)
+        thread2 = myThread("DuunionOffers-collector", colletor2)
+        thread2.setDaemon(True)
+        thread2.start()
 
         while True:
             pass

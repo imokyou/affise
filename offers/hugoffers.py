@@ -9,12 +9,14 @@ from datetime import datetime
 
 
 class Hugoffers(object):
+    name = "Hugoffers"
     domain = "http://tapcrane.hoapi0.com"
     key = "1d72fd30c41a487d9b798408148cc5fa"
     advertiser = "5df8c50410768e44b351cc66"
     api = ""
     timeout = 120
-    limit = 50
+    limit = 150
+    page = 10
     logger = None
     price_lower = 0.2
     payment_percent = 0.5
@@ -169,7 +171,7 @@ class Hugoffers(object):
 
 if __name__ == '__main__':
     app = Hugoffers()
-    for x in xrange(1, 2):
+    for x in xrange(1, app.page):
         offers = app.download(x)
         if not offers:
             app.logger.info("pull offers finish in page %s" % x)

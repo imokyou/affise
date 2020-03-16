@@ -9,13 +9,15 @@ from datetime import datetime
 
 
 class DuunionOffers(object):
+  name = "DuunionOffers"
   domain = "http://feed.xyz.duunion.com/offers"
   aff_id = "921"
   key = "66f7fde2790496738fe1d4d1c678dcb8"
   advertiser = "5e6e4e27cf4c2cc25ba61f68"
   api = ""
   timeout = 120
-  limit = 1
+  limit = 150
+  page = 10
   logger = None
   price_lower = 0.2
   payment_percent = 0.5
@@ -115,9 +117,13 @@ class DuunionOffers(object):
     return [targets]
 
   def extract_tracking_link(self, tracking_link):
-    # click={clickid}&aff_sub={pid}&gaid={sub3}&android_id={sub4}&payout={sum}&idfa={sub5}
-    tracking_link += "&click={clickid}&aff_sub={pid}&gaid={sub3}&android_id={sub4}&payout={sum}&idfa={sub5}"
-    return tracking_link
+    # tracking_link += "&click={clickid}&aff_sub={pid}&gaid={sub3}&android_id={sub4}&payout={sum}&idfa={sub5}"
+    # return tracking_link
+    return tracking_link.replace('[click_id]', '[clickid]') \
+            .replace('[source]', '[sub2]') \
+            .replace('[idfa]', '[sub3]') \
+            .replace('[advertising_id]', '[sub4]') \
+            .replace('[', '{').replace(']', '}')
 
   def extract_status(self, d):
     status = "active"
@@ -172,7 +178,7 @@ class DuunionOffers(object):
 
 if __name__ == '__main__':
   app = DuunionOffers()
-  for x in xrange(1, 2):
+  for x in xrange(1, app.page):
     offers = app.download(x)
     if not offers:
       app.logger.info("pull offers finish in page %s" % x)
