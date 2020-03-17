@@ -16,7 +16,7 @@ class DuunionOffers(object):
   advertiser = "5e6e4e27cf4c2cc25ba61f68"
   api = ""
   timeout = 120
-  limit = 150
+  limit = 2
   page = 10
   logger = None
   price_lower = 0.2
@@ -119,11 +119,14 @@ class DuunionOffers(object):
   def extract_tracking_link(self, tracking_link):
     # tracking_link += "&click={clickid}&aff_sub={pid}&gaid={sub3}&android_id={sub4}&payout={sum}&idfa={sub5}"
     # return tracking_link
+    return tracking_link + "&aff_sub={clickid}"
+    '''
     return tracking_link.replace('[click_id]', '[clickid]') \
             .replace('[source]', '[sub2]') \
             .replace('[idfa]', '[sub3]') \
             .replace('[advertising_id]', '[sub4]') \
             .replace('[', '{').replace(']', '}')
+    '''
 
   def extract_status(self, d):
     status = "active"

@@ -153,10 +153,10 @@ class Collecter(object):
             print(e)
             return None
 
-    def list(self, advertiser = "", page = 1, limit = 100):
+    def list(self, advertiser = "", page = 1, limit = 200):
         if limit == 0:
             limit = self.list_limit
-        api = "%s?status[]=stopped&status[]=active&page=%s&limit=%s" % (self.list_api, page, limit)
+        api = "%s?status[]=active&page=%s&limit=%s" % (self.list_api, page, limit)
         if advertiser != "":
             api = "%s&advertiser[]=%s" % (api, advertiser)
         
@@ -219,6 +219,8 @@ class Collecter(object):
                     if v[3] == "active":
                         self.update_offer_status(v[0], "stopped")
                 else:
+                    ov  = all_external_offers[ext_id]
+                    self.update_offer_status(v[0], "active", ov["url"])
                     exists_offers[ext_id] = v
 
             for ext_id, v in all_external_offers.items():
