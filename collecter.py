@@ -14,6 +14,7 @@ from offers.appleadstech import Appleadstech
 from offers.ichestnut import Ichestnut
 from offers.hugoffers import Hugoffers
 from offers.duunion import DuunionOffers
+from offers.duunion2 import DuunionOffers2
 from dao import OfferDao
 
 
@@ -264,6 +265,12 @@ def main():
         thread2 = myThread("DuunionOffers-collector", colletor2)
         thread2.setDaemon(True)
         thread2.start()
+
+        offerApp3 = DuunionOffers2()
+        colletor3 = Collecter(offerApp3)
+        thread3 = myThread("DuunionOffers2-collector", colletor3)
+        thread3.setDaemon(True)
+        thread3.start()
 
         while True:
             pass

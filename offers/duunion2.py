@@ -8,11 +8,11 @@ import json
 from datetime import datetime
 
 
-class DuunionOffers(object):
+class DuunionOffers2(object):
   name = "DuunionOffers"
   domain = "http://feed.xyz.duunion.com/offers"
-  aff_id = "921"
-  key = "66f7fde2790496738fe1d4d1c678dcb8"
+  aff_id = "922"
+  key = "45788d3a2bee1963399bab9b38f032c6"
   advertiser = "5e6e4e27cf4c2cc25ba61f68"
   api = ""
   timeout = 120
