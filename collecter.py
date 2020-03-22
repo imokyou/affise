@@ -254,23 +254,30 @@ def main():
         signal.signal(signal.SIGINT, quit)
         signal.signal(signal.SIGTERM, quit)
 
-        offerApp1 = Hugoffers()
-        colletor1 = Collecter(offerApp1)
-        thread1 = myThread("Hugoffers-collector", colletor1)
-        thread1.setDaemon(True)
-        thread1.start()
 
-        offerApp2 = DuunionOffers()
-        colletor2 = Collecter(offerApp2)
-        thread2 = myThread("DuunionOffers-collector", colletor2)
-        thread2.setDaemon(True)
-        thread2.start()
+        # offerApp1 = Hugoffers()
+        # colletor1 = Collecter(offerApp1)
+        # thread1 = myThread("Hugoffers-collector", colletor1)
+        # thread1.setDaemon(True)
+        # thread1.start()
 
-        offerApp3 = DuunionOffers2()
-        colletor3 = Collecter(offerApp3)
-        thread3 = myThread("DuunionOffers2-collector", colletor3)
-        thread3.setDaemon(True)
-        thread3.start()
+        # offerApp2 = DuunionOffers()
+        # colletor2 = Collecter(offerApp2)
+        # thread2 = myThread("DuunionOffers-collector", colletor2)
+        # thread2.setDaemon(True)
+        # thread2.start()
+
+        # offerApp3 = DuunionOffers2()
+        # colletor3 = Collecter(offerApp3)
+        # thread3 = myThread("DuunionOffers2-collector", colletor3)
+        # thread3.setDaemon(True)
+        # thread3.start()
+
+        offerApp4 = Appleadstech()
+        colletor4 = Collecter(offerApp4)
+        thread4 = myThread("Appleadstech-collector", colletor4)
+        thread4.setDaemon(True)
+        thread4.start()
 
         while True:
             pass

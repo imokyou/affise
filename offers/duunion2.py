@@ -180,7 +180,7 @@ class DuunionOffers2(object):
 
 
 if __name__ == '__main__':
-  app = DuunionOffers()
+  app = DuunionOffers2()
   for x in xrange(1, app.page):
     offers = app.download(x)
     if not offers:

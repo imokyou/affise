@@ -1,15 +1,24 @@
 # coding=utf8
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 import requests
 import logging
-
+import json
+from datetime import datetime
 
 class Appleadstech(object):
+    name = "Appleadstech"
     domain = "http://api.appleadstech.com"
-    key = "abcdefc"
+    key = "sQtYpM4nB54seC2FpW3CsefQbNDrBAryYtB"
+    advertiser = "5e5e352e3e69e6128bb5e177"
     api = ""
-    timeout = 15
-    limit = 1000
+    timeout = 120
+    limit = 150
+    page = 10
     logger = None
+    price_lower = 0.2
+    payment_percent = 0.5
 
 
     def __init__(self):
@@ -21,7 +30,7 @@ class Appleadstech(object):
         self.api = "%s/v3/api_v3?key=%s%s" % (self.domain, self.key, query)
 
     def make_request(self, page):
-        query = "&page=%s" % page
+        query = "&page=%s&limit=%s" % (page, self.limit)
         self.set_api(query)
         self.logger.info("download offers from %s" % self.api)
         resp = requests.get(self.api, timeout=self.timeout)
@@ -30,89 +39,100 @@ class Appleadstech(object):
             resp = requests.get(self.api, timeout=self.timeout)
         return resp
 
+    def match_price_lower(self, price):
+        if float(price) < self.price_lower:
+            return False
+
+        return True
+
     def extrace_offer_creatvies(self, d):
         creatives = []
-        for creatvie in d["creatives"]:
-            creatives.append(creatvie["url"])
         return creatives
+
+    def extrace_offer_logo(self, d):
+        logo = None
+        if d["icon"] != "":
+            logo = d["icon"]
+        return logo
 
     def extrace_offer_caps(self, d):
         caps = []
-        if d["cap"] != 0:   
-            caps.append({
-                "value": d["caps"]
-            })
+        caps.append({
+            "affiliate_type": "all",
+            "goal_type": "all",
+            "period": "day",
+            "type": "conversions",
+            "value": int(d["cap"])
+        })
         return caps
+
+    def cal_channel_payment(self, price):
+        return float(price) * self.payment_percent
+
 
     def extrace_offer_payments(self, d):
         payments = []
         payments.append({
-            "partners": [],
-            "countries": [],
-            "country_exclude": [],
-            "cities": [],
-            "devices": [d["device"]],
-            "os": [d["os"]],
-            "revenue": d["payout"],
-            "currency": d["currency"]
+            "goal": "1",
+            "total": float(d["payout"]),
+            "currency": d["currency"],
+            "type": "fixed",
+            "revenue": self.cal_channel_payment(d["payout"])
         })
         return payments
 
     def extrace_offer_targeting(self, d):
-        targets = {}
-        countries = []
+        targets = {
+            "country": {"allow":[], "deny":[]},
+            # "region": {"allow":[], "deny":[]},
+            # "city": {"allow":[], "deny":[]},
+            "os": {"allow":[], "deny":[]},
+            # "isp": {"allow":[], "deny":[]},
+            # "ip": {"allow":[], "deny":[]},
+            # "browser": {"allow":[], "deny":[]},
+            # "brand": {"allow":[], "deny":[]},
+            # "device_type": [],
+            # "connection": [],
+            # "affiliate_id": [],
+            # "sub": [],
+            # "deny_groups":[],
+            # "url": ""
+        }
         if d["countries"] != "":
-            countries = d["countries"].split(",")
-            targets["country"] = {
-                "allow": countries
-            }
+            targets["country"]["allow"].append(d["countries"])
         if d["os"] != "":
-            targets["os"] = {
-                "allow": [{
-                    "name": d["os"].capitalize(),
-                    "comparison": "",
-                    "version": ""
-                }]
-            }
-        return targets
+            targets["os"]["allow"].append(d["os"])
+        return [targets]
+
+    def extract_tracking_link(self, tracking_link):
+        return tracking_link + "&aff_sub={clickid}"
 
     def extract_offer(self, data):
         offers = []
-        for d in data:
-            is_cpi = 0 
+        for d in data["data"]:
+            is_cpi = 0
             if d["convert_type"] == "CPI":
                 is_cpi = 1
 
+            if not self.match_price_lower(d['payout']):
+                continue
+    
             offers.append({
+                "external_offer_id": d["id"],
                 "title": d["name"],
-                "advertiser": "5d6daf51ca6d0cb8d736273d",
-                "url": d["click_url"],
-                "cross_postback_url": "",
+                "advertiser": self.advertiser,
+                "url": self.extract_tracking_link(d["click_url"]),
                 "url_preview": d["preview_link"],
-                "trafficback_url": "",
-                "domain_url": 0,
-                "description_lang": [],
-                "stopDate": "",
-                "creativeFiles": [],
-                "creativeUrls": self.extrace_offer_creatvies(d["creatives"]),
-                "sources": [],
-                "logo": d["icon"],
+                "logo": self.extrace_offer_logo(d),
                 "status": d["status"],
-                "tags": [],
-                "privacy": "public",
-                "is_top": 0,
                 "is_cpi": is_cpi,
                 "payments": self.extrace_offer_payments(d),
-                "partner_payments": [],
-                "notice_percent_overcap": 90,
-                "landings": [],
-                "strictly_country": 0,
-                "restriction_os": [],
                 "caps": self.extrace_offer_caps(d),
-                "targeting": self.extrace_offer_targeting(d)
+                "targeting": self.extrace_offer_targeting(d),
+                "stopDate": "",
+                "start_at": "",
             })
         return offers
-
 
     def download(self, page):
         resp = self.make_request(page)
@@ -129,9 +149,11 @@ class Appleadstech(object):
 
 if __name__ == '__main__':
     app = Appleadstech()
-    for x in xrange(1, 10):
+    for x in xrange(1, app.page):
         offers = app.download(x)
         if not offers:
             app.logger.info("pull offers finish in page %s" % x)
             break
+        print json.dumps(offers)
+        break
     app.logger.info("pull offers done")
