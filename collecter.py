@@ -15,6 +15,9 @@ from offers.ichestnut import Ichestnut
 from offers.hugoffers import Hugoffers
 from offers.duunion import DuunionOffers
 from offers.duunion2 import DuunionOffers2
+from offers.vinsmok import Vinsmok
+from offers.mobisummer import Mobisummer
+from offers.interestmob import Interestmob
 from dao import OfferDao
 
 
@@ -229,11 +232,13 @@ class Collecter(object):
                 if not ids:
                     resp = self.add(v)
                     print resp
+                    break
                     # pass
                 else:
                     print "offer exists", ext_id, v["external_offer_id"]
             
             print len(not_exists_offers), len(exists_offers), len(all_offers), len(all_external_offers)
+            break
             time.sleep(60 * 30)
                     
 
@@ -273,11 +278,29 @@ def main():
         # thread3.setDaemon(True)
         # thread3.start()
 
-        offerApp4 = Appleadstech()
-        colletor4 = Collecter(offerApp4)
-        thread4 = myThread("Appleadstech-collector", colletor4)
-        thread4.setDaemon(True)
-        thread4.start()
+        # offerApp4 = Appleadstech()
+        # colletor4 = Collecter(offerApp4)
+        # thread4 = myThread("Appleadstech-collector", colletor4)
+        # thread4.setDaemon(True)
+        # thread4.start()
+
+        # offerApp5 = Vinsmok()
+        # colletor5 = Collecter(offerApp5)
+        # thread5 = myThread("Vinsmok-collector", colletor5)
+        # thread5.setDaemon(True)
+        # thread5.start()
+
+        # offerApp6 = Mobisummer()
+        # colletor6 = Collecter(offerApp6)
+        # thread6 = myThread("Mobisummer-collector", colletor6)
+        # thread6.setDaemon(True)
+        # thread6.start()
+
+        offerApp7 = Interestmob()
+        colletor7 = Collecter(offerApp7)
+        thread7 = myThread("Interestmob-collector", colletor7)
+        thread7.setDaemon(True)
+        thread7.start()
 
         while True:
             pass
